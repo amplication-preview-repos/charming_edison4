@@ -1,0 +1,96 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model ParkingSpace {
+  availability Json?
+  bookings     Booking[]
+  createdAt    DateTime  @default(now())
+  event        Event?    @relation(fields: [eventId], references: [id])
+  eventId      String?
+  id           String    @id @default(cuid())
+  location     String?
+  owner        String?
+  photos       Json?
+  price        Float?
+  reviews      Review[]
+  updatedAt    DateTime  @updatedAt
+}
+
+model Booking {
+  createdAt      DateTime                  @default(now())
+  driver         Driver?                   @relation(fields: [driverId], references: [id])
+  driverId       String?
+  endTime        DateTime?
+  id             String                    @id @default(cuid())
+  parkingSpace   ParkingSpace?             @relation(fields: [parkingSpaceId], references: [id])
+  parkingSpaceId String?
+  paymentStatus  EnumBookingPaymentStatus?
+  startTime      DateTime?
+  updatedAt      DateTime                  @updatedAt
+}
+
+model Driver {
+  bookings      Booking[]
+  createdAt     DateTime  @default(now())
+  email         String?
+  fullName      String?
+  id            String    @id @default(cuid())
+  loyaltyPoints Int?
+  password      String?
+  reviews       Review[]
+  updatedAt     DateTime  @updatedAt
+}
+
+model Review {
+  comment        String?
+  createdAt      DateTime      @default(now())
+  driver         Driver?       @relation(fields: [driverId], references: [id])
+  driverId       String?
+  id             String        @id @default(cuid())
+  parkingSpace   ParkingSpace? @relation(fields: [parkingSpaceId], references: [id])
+  parkingSpaceId String?
+  rating         Int?
+  updatedAt      DateTime      @updatedAt
+}
+
+model Event {
+  createdAt     DateTime       @default(now())
+  endDate       DateTime?
+  id            String         @id @default(cuid())
+  location      String?
+  name          String?
+  parkingSpaces ParkingSpace[]
+  startDate     DateTime?
+  updatedAt     DateTime       @updatedAt
+}
+
+model PremiumFeature {
+  createdAt   DateTime @default(now())
+  description String?
+  id          String   @id @default(cuid())
+  name        String?
+  price       Float?
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumBookingPaymentStatus {
+  Option1
+}
